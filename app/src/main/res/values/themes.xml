@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 순수 흰 바탕, 애니메이션 없음 (이잉크 잔상 최소화) -->
+    <style name="Theme.Sam" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/paper</item>
+        <item name="android:colorBackground">@color/paper</item>
+        <item name="android:colorAccent">@color/ink</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:alertDialogTheme">@style/Theme.Sam.Dialog</item>
+    </style>
+    <style name="Theme.Sam.Dialog" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">@color/ink</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>
