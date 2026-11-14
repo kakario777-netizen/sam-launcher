@@ -58,7 +58,7 @@ class HomeActivity : Activity(), CellGrid.Listener {
         updater = Updater.get(this)
         updateDialogs = UpdateDialogs(this, updater)
 
-        val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(PAPER) }
+        val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(PAPER); fitsSystemWindows = true }
         grid = CellGrid(this, this)
         root.addView(grid, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         root.addView(bottomBar(), LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(60)))
@@ -225,26 +225,9 @@ class HomeActivity : Activity(), CellGrid.Listener {
         toast("'${e.label}'을(를) 홈에서 뺐어요. ☰ → 숨긴 앱에서 되돌릴 수 있어요")
     }
 
-    /** 빈 칸 길게 누르기: 이 칸에 넣을 앱 고르기 (숨긴 앱·다른 칸의 앱 모두 가능). */
+    /** 빈 칸 길게 누르기: 이 칸에 넣을 앱 고르기 (페이지로 나뉜 목록 화면). */
     private fun pickAppFor(idx: Int) {
-        val all = installed.values.sortedWith(compareBy({ !it.pkg.startsWith("com.kakario.") }, { it.label }))
-        val hidden = store.hidden
-        val names = all.map { a ->
-            when {
-                a.key in hidden -> "${a.label}  (숨김)"
-                a.key in slots -> "${a.label}  (홈에 있음)"
-                else -> a.label
-            }
-        }.toTypedArray()
-        dialog("이 칸에 넣을 앱").setItems(names) { _, w ->
-            val a = all[w]
-            val old = slots.indexOf(a.key)
-            if (old >= 0) slots[old] = ""
-            ensureSize(idx + 1)
-            slots[idx] = a.key
-            store.hidden = hidden.apply { remove(a.key) }
-            save(); render()
-        }.setNegativeButton("닫기", null).show()
+        startActivity(Intent(this, AppListActivity::class.java).putExtra(AppListActivity.EXTRA_PICK_SLOT, idx))
     }
 
     // ── ☰ 메뉴 ──
