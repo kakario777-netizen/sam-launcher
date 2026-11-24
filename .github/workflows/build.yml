@@ -43,6 +43,13 @@ jobs:
       - name: Rename APK
         run: cp app/build/outputs/apk/debug/app-debug.apk sam-launcher-${{ github.run_number }}.apk
 
+      # 완성 APK를 작업 결과물로 남긴다 — 공개 릴리스 저장소(sam-launcher-release)에는 세션에서 직접 올린다
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: sam-launcher-${{ github.run_number }}.apk
+
+      # [다리 버전] 이미 깔린 옛 버전이 이 버전을 받아 새 위치로 넘어가도록 옛 위치에도 한 번 더 올린다
       - name: Publish to Releases (latest)
         env:
           GH_TOKEN: ${{ github.token }}

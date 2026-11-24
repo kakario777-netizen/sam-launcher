@@ -168,8 +168,10 @@ class Updater private constructor(private val context: Context) {
     private fun fetchLatest(): Release? {
         val conn = open(API)
         val json = JSONObject(conn.inputStream.bufferedReader().use { it.readText() })
-        // 릴리스 이름 '최신 빌드 #25' 의 25 = 빌드 번호 = 앱 versionCode
-        val build = Regex("#(\\d+)").find(json.optString("name"))?.groupValues?.get(1)?.toIntOrNull() ?: return null
+        // 릴리스 이름 '… (빌드 #25)' 또는 태그 'v0.1.25' 의 25 = 빌드 번호 = 앱 versionCode
+        val build = Regex("#(\\d+)").find(json.optString("name"))?.groupValues?.get(1)?.toIntOrNull()
+            ?: Regex("^v\\d+\\.\\d+\\.(\\d+)$").find(json.optString("tag_name"))?.groupValues?.get(1)?.toIntOrNull()
+            ?: return null
         val assets = json.optJSONArray("assets") ?: return null
         for (i in 0 until assets.length()) {
             val a = assets.getJSONObject(i)
@@ -198,7 +200,8 @@ class Updater private constructor(private val context: Context) {
     }
 
     companion object {
-        private const val API = "https://api.github.com/repos/kakario777-netizen/sam-launcher/releases/tags/latest"
+        private const val API = "https://api.github.com/repos/kakario777-netizen/sam-launcher-release/releases/latest"
+        // 코드 저장소는 비공개로 두고, 완성된 APK만 공개 릴리스 저장소(sam-launcher-release)에서 받는다
 
         @Volatile private var instance: Updater? = null
         fun get(context: Context): Updater =
